@@ -62,6 +62,8 @@ function season(month, hemisphere) {
   return north;
 }
 
+const cap = (s) => s[0].toUpperCase() + s.slice(1);
+
 function fmt(n, digits = 0) {
   return n.toLocaleString('en-US', { maximumFractionDigits: digits, minimumFractionDigits: digits });
 }
@@ -179,6 +181,11 @@ export async function composePass(input) {
     seasonLine:
       hemisphere === 'north' || hemisphere === 'south'
         ? `It was ${season(month, hemisphere)} where you were, in the ${hemisphere}ern hemisphere.`
+        : null,
+    // Compact form for the ticket-fields row.
+    seasonShort:
+      hemisphere === 'north' || hemisphere === 'south'
+        ? `${cap(season(month, hemisphere))} · ${cap(hemisphere)}ern hemisphere`
         : null,
     permalink: { d: `${year}${String(month).padStart(2, '0')}${String(day).padStart(2, '0')}`, o: occasion, h: hemisphere },
   };

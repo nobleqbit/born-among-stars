@@ -99,6 +99,7 @@ test('composePass assembles a full card', async () => {
   assert.ok(pass.destination.name);
   assert.ok(pass.quantum);
   assert.match(pass.seasonLine, /spring/);
+  assert.equal(pass.seasonShort, 'Spring · Northern hemisphere');
   assert.equal(pass.permalink.d, '19900314');
   // Cosmic identity: pronounceable callsign, designation, 7-line address.
   assert.match(pass.identity.callsign, /^[A-Z][a-z]{3,}$/);
