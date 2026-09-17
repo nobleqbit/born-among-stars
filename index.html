@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Born Among Stars</title>
+  <meta name="description" content="Give a date. Get a destination in the cosmos, the real astronomy that ties it to you, and a transmission for the year ahead. Nothing leaves your browser.">
+  <meta property="og:title" content="Born Among Stars">
+  <meta property="og:description" content="Your date, your cosmic boarding pass. Real astronomy, zero data collection.">
+  <meta name="theme-color" content="#070b16">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✦</text></svg>">
+</head>
+<body>
+  <canvas id="sky" aria-hidden="true"></canvas>
+
+  <main class="wrap">
+    <header class="hero">
+      <p class="hero__eyebrow">A cosmic boarding pass, generated from a date</p>
+      <h1>Born Among Stars</h1>
+      <p class="hero__lede">
+        Give a day that matters. We turn it into an astronomer’s day-number, run the real
+        orbital mechanics, find the star whose light from that day is arriving now, and assign
+        you a destination somewhere in the universe — with a reason, and a transmission for the
+        year ahead.
+      </p>
+      <p class="hero__privacy">
+        <strong>No account, no name, no tracking.</strong> Every calculation happens in your
+        browser. There is no server to send anything to — open DevTools and watch nothing leave.
+      </p>
+    </header>
+
+    <form id="form" class="form" autocomplete="off">
+      <div class="form__row">
+        <label>Year
+          <select id="year" required></select>
+        </label>
+        <label>Month
+          <select id="month" required></select>
+        </label>
+        <label>Day
+          <select id="day" required></select>
+        </label>
+      </div>
+      <div class="form__row">
+        <label>Occasion
+          <select id="occasion"></select>
+        </label>
+        <label>Hemisphere <span class="form__opt">(optional)</span>
+          <select id="hemisphere">
+            <option value="skip">Skip</option>
+            <option value="north">Northern</option>
+            <option value="south">Southern</option>
+          </select>
+        </label>
+      </div>
+      <button type="submit" class="btn btn--primary">Issue my boarding pass</button>
+      <p id="status" class="status" role="status"></p>
+    </form>
+
+    <section id="pass" class="pass-slot"></section>
+
+    <div id="actions" class="actions" hidden>
+      <button id="copy-link" class="btn">Copy link to this card</button>
+      <button id="download" class="btn">Download as image</button>
+      <p class="actions__note">The link reproduces this exact card — it’s deterministic. Share it, or send someone theirs.</p>
+    </div>
+
+    <footer class="foot">
+      <p>
+        Every number on a card is real and checkable — orbital periods from NASA fact sheets,
+        star distances from Hipparcos and Gaia, the day-number from the standard Julian Day
+        formula. <a href="docs/MATH.md">Here is exactly how it works.</a>
+      </p>
+      <p>
+        The destination is assigned by a SHA-256 hash of your date — fair and reproducible, not
+        fate. The meaning is in the astronomy. Open source, MIT.
+        <a href="https://github.com/nobleqbit/born-among-stars">Source on GitHub.</a>
+      </p>
+    </footer>
+  </main>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
