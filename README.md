@@ -10,7 +10,7 @@ Nothing to install, no account, nothing leaves your browser. Pick a date, get yo
 
 *The card for 1 January 2001. Click it to open the live version — same date, same card, every time.*
 
-Pick a birthday, an anniversary, a milestone — any day that matters. The site turns it into an astronomer's day-number, runs the real orbital mechanics on it, finds the star whose light from that day is arriving *right now*, and assigns you a destination somewhere in the universe — a moon, a probe, a particle, a void — with a reason you were sent there and a transmission for the year ahead.
+Pick a birthday, an anniversary, a milestone — any day that matters. The site turns it into an astronomer's day-number, runs the real orbital mechanics on it, finds the star whose light from that day is arriving *right now*, and assigns you a destination somewhere in the universe — a moon, a probe, a particle, a void - with a reason you were sent there and a transmission for the year ahead.
 
 It is meant to make someone feel seen, and then smile.
 
@@ -66,7 +66,7 @@ node --test
 
 ## Add a destination
 
-Edit [`js/catalog.js`](js/catalog.js). Each entry needs `id`, `name`, `kind`, `where`, exactly three `facts` (true and checkable — cite a mission or fact sheet in your PR), a `grit` paragraph, a one-line `strength` and `caution`, a `forward` paragraph, a `transmission`, and a `forWho`. The test suite enforces the shape. Please keep the voice: warm, wry, specific, never saccharine.
+Edit [`js/catalog.js`](js/catalog.js). Each entry needs `id`, `name`, `kind`, `where`, exactly three `facts` (true and checkable - cite a mission or fact sheet in your PR), a `grit` paragraph, a one-line `strength` and `caution`, a `forward` paragraph, a `transmission`, and a `forWho`. The test suite enforces the shape. Please keep the voice: warm, wry, specific, never saccharine.
 
 Also add `img/<id>.jpg` (≤1400px, public domain or CC — NASA's image library is the easy source) and its entry in [`js/images.js`](js/images.js) with title, credit, license and source URL; the tests check both exist. Add the same row to [`CREDITS.md`](CREDITS.md).
 
