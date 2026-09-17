@@ -23,12 +23,17 @@ That line is not a metaphor. It is checkable physics, personalised to a date. Th
 | **Strength / Constructive / Forward vector** | The positive read, the shadow of it, and forward-looking guidance from that body | written, not generated |
 | **Transmission** | A line from your destination | written |
 | **SIG** | SHA-256 of date + occasion — same inputs, same card, forever | deterministic |
+| **Photo** | A real image of your destination — Juno's Io, New Horizons' Pluto, Cassini's Enceladus geysers | ✅ NASA/ESA, bundled |
+| **Cosmic identity** | We never ask your name, so we issue one: a callsign ("Veleth of Io"), a designation (`BAS-2447965-IO`), and a 7-line address from your destination out to the Observable Universe | deterministic; address is real astronomy |
+| **Voyage** | A little probe animates from Earth to your destination as the card issues | for fun |
 
 Download it as an image, or share the link — it regenerates identically.
 
 ## Privacy is structural, not a promise
 
-There is **no server**. This is a static page; every calculation runs in your browser. No name is asked for. The link encodes only `d=YYYYMMDD`, `o=occasion`, and optionally a hemisphere. Open your network inspector after load: nothing is sent, because there is nowhere to send it.
+There is **no server**. This is a static page; every calculation runs in your browser. No name is asked for — the cosmos issues you one. The link encodes only `d=YYYYMMDD`, `o=occasion`, and optionally a hemisphere. Open your network inspector after load: nothing is sent, because there is nowhere to send it.
+
+That includes the photos. Destination images are **bundled in the repo** and served from this site's own origin rather than hotlinked from NASA — hotlinking would leak your destination (and so a hash of your date) to a third party's server logs and make the promise above false.
 
 ## Honest about the one "random" part
 
@@ -55,6 +60,8 @@ node --test
 
 Edit [`js/catalog.js`](js/catalog.js). Each entry needs `id`, `name`, `kind`, `where`, exactly three `facts` (true and checkable — cite a mission or fact sheet in your PR), a `grit` paragraph, a one-line `strength` and `caution`, a `forward` paragraph, a `transmission`, and a `forWho`. The test suite enforces the shape. Please keep the voice: warm, wry, specific, never saccharine.
 
+Also add `img/<id>.jpg` (≤1400px, public domain or CC — NASA's image library is the easy source) and its entry in [`js/images.js`](js/images.js) with title, credit, license and source URL; the tests check both exist. Add the same row to [`CREDITS.md`](CREDITS.md).
+
 Adding a body changes the catalog size and therefore *every* existing card's destination (the hash is taken mod catalog size). That's acceptable while the project is young; if it ever matters, append and pin the modulus.
 
 ## Project layout
@@ -69,10 +76,13 @@ js/signature.js     SHA-256 → SIG + catalog index
 js/compose.js       inputs → complete pass object
 js/render.js        DOM rendering + PNG export
 js/main.js          UI, permalinks, starfield
+js/images.js        credit / license / source for every bundled image
+img/                one photo per destination, served same-origin
+CREDITS.md          image attributions
 tests/              node --test
 docs/MATH.md        every formula, with sources
 ```
 
 ## License
 
-[MIT](LICENSE). Not affiliated with NASA, ESA, or anyone else who actually goes to space.
+Code: [MIT](LICENSE). Images: NASA imagery is public domain; the few Creative Commons images (see [`CREDITS.md`](CREDITS.md)) remain under their own licenses, not MIT. Not affiliated with NASA, ESA, or anyone else who actually goes to space.

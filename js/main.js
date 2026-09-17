@@ -87,12 +87,14 @@ $('#copy-link').addEventListener('click', async () => {
   }
 });
 
-$('#download').addEventListener('click', () => {
+$('#download').addEventListener('click', async () => {
   if (!current) return;
+  status.textContent = 'Rendering your pass…';
   const a = document.createElement('a');
-  a.href = passToPNG(current);
+  a.href = await passToPNG(current);
   a.download = `born-among-stars-${current.permalink.d}-${current.destination.id}.png`;
   a.click();
+  status.textContent = '';
 });
 
 // ── Starfield ────────────────────────────────────────────────────────────

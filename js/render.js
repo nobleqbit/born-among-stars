@@ -1,5 +1,7 @@
 // Renders a pass to the DOM, and to a PNG via canvas for sharing.
 
+import { IMAGE_CREDITS } from './images.js';
+
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
 export function renderPass(pass, root) {
@@ -109,13 +111,33 @@ function wrap(ctx, text, maxWidth) {
   return lines;
 }
 
-/** Draws the pass to a canvas and returns a PNG data URL. */
-export function passToPNG(pass) {
+function loadImage(src) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = () => resolve(null); // no photo is fine; the card still exports
+    img.src = src;
+  });
+}
+
+/** Draw an image to fill a box, cropping to preserve aspect (CSS object-fit: cover). */
+function drawCover(ctx, img, x, y, w, h) {
+  const s = Math.max(w / img.width, h / img.height);
+  const sw = w / s;
+  const sh = h / s;
+  ctx.drawImage(img, (img.width - sw) / 2, (img.height - sh) / 2, sw, sh, x, y, w, h);
+}
+
+const PHOTO_H = 440;
+
+/** Draws the pass to a canvas and resolves to a PNG data URL. */
+export async function passToPNG(pass) {
   const W = 1200;
   const pad = 64;
   const maxW = W - pad * 2;
   const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d');
+  const img = await loadImage(pass.image);
 
   // Measure first: lay out into a list of {text, font, color, gap}.
   const blocks = [];
@@ -130,7 +152,11 @@ export function passToPNG(pass) {
   add(`Origin: Earth · ${pass.date.label} · Julian Day ${pass.jdn.toLocaleString('en-US')} · SIG ${pass.signature}`, `400 20px ${mono}`, '#9aa4b2', 34);
   add('DESTINATION', `600 18px ${mono}`, '#8fb3ff', 4);
   add(d.name, `700 44px ${serif}`, '#ffd27a', 4);
-  add(`${d.kind} — ${d.where}`, `400 22px ${sans}`, '#c9d1dc', 28);
+  add(`${d.kind} — ${d.where}`, `400 22px ${sans}`, '#c9d1dc', 24);
+  add('ISSUED TO', `600 18px ${mono}`, '#8fb3ff', 4);
+  add(pass.identity.fullName, `700 34px ${serif}`, '#ffffff', 4);
+  add(pass.identity.designation, `500 18px ${mono}`, '#9aa4b2', 10);
+  add(pass.identity.address.slice(1).join('  ·  '), `400 17px ${mono}`, '#8b95a5', 28);
   add('WHY YOU WERE SENT HERE', `600 18px ${mono}`, '#8fb3ff', 8);
   add(d.grit, `400 24px ${sans}`, '#e8edf3', 26);
   add('COSMIC ODOMETER', `600 18px ${mono}`, '#8fb3ff', 8);
@@ -145,9 +171,10 @@ export function passToPNG(pass) {
   add(`“${d.transmission}”`, `italic 700 30px ${serif}`, '#ffd27a', 20);
   add('born-among-stars · every number on this card is real and checkable', `400 16px ${mono}`, '#6b7686', 0);
 
-  // Height pass
+  // Height pass — the photo (if any) sits above the text blocks.
   canvas.width = W;
-  let h = pad;
+  const photoTop = pad;
+  let h = pad + (img ? PHOTO_H + 32 : 0);
   const laid = blocks.map((b) => {
     ctx.font = b.font;
     const size = parseInt(b.font.match(/(\d+)px/)[1], 10);
@@ -173,6 +200,31 @@ export function passToPNG(pass) {
     ctx.fillStyle = `rgba(255,255,255,${0.25 + rnd() * 0.6})`;
     ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();
   }
+  // Destination photo: rounded, cover-fit, fading into the card, with credit.
+  if (img) {
+    const r = 18;
+    ctx.save();
+    ctx.beginPath();
+    ctx.roundRect(pad, photoTop, maxW, PHOTO_H, r);
+    ctx.clip();
+    drawCover(ctx, img, pad, photoTop, maxW, PHOTO_H);
+    const fade = ctx.createLinearGradient(0, photoTop + PHOTO_H * 0.55, 0, photoTop + PHOTO_H);
+    fade.addColorStop(0, 'rgba(7,11,22,0)');
+    fade.addColorStop(1, 'rgba(7,11,22,0.85)');
+    ctx.fillStyle = fade;
+    ctx.fillRect(pad, photoTop, maxW, PHOTO_H);
+    const credit = IMAGE_CREDITS[d.id];
+    if (credit) {
+      ctx.font = `400 14px ${mono}`;
+      ctx.fillStyle = 'rgba(200,210,224,0.85)';
+      ctx.textAlign = 'right';
+      ctx.textBaseline = 'bottom';
+      ctx.fillText(`${credit.title} — ${credit.credit}`.slice(0, 110), pad + maxW - 16, photoTop + PHOTO_H - 12);
+      ctx.textAlign = 'left';
+    }
+    ctx.restore();
+  }
+
   // Card frame
   ctx.strokeStyle = 'rgba(143,179,255,0.35)';
   ctx.lineWidth = 2;
