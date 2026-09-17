@@ -6,6 +6,10 @@
 
 Nothing to install, no account, nothing leaves your browser. Pick a date, get your destination, callsign, and address in the cosmos — then share the link or download the card.
 
+[![A Born Among Stars boarding pass for 1 January 2001 — destination PSR B1919+21, the first pulsar; callsign Sudara; light-mail from Fomalhaut](docs/screenshot.jpg)](https://nobleqbit.github.io/born-among-stars/?d=20010101&o=birthday)
+
+*The card for 1 January 2001. Click it to open the live version — same date, same card, every time.*
+
 Pick a birthday, an anniversary, a milestone — any day that matters. The site turns it into an astronomer's day-number, runs the real orbital mechanics on it, finds the star whose light from that day is arriving *right now*, and assigns you a destination somewhere in the universe — a moon, a probe, a particle, a void — with a reason you were sent there and a transmission for the year ahead.
 
 It is meant to make someone feel seen, and then smile.
@@ -85,6 +89,8 @@ img/                one photo per destination, served same-origin
 CREDITS.md          image attributions
 tests/              node --test
 docs/MATH.md        every formula, with sources
+docs/card.html      card-only view (same ?d=&o=&h= params) for embeds, printing, screenshots
+docs/screenshot.jpg the README image, captured from docs/card.html
 ```
 
 ## License

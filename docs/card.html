@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Resolve css/js/img against the site root so this page works from /docs/. -->
+  <base href="../">
+  <title>Card · Born Among Stars</title>
+  <meta name="robots" content="noindex">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    /* Card-only view: same URL params as the main page (?d=YYYYMMDD&o=…&h=…).
+       Used for embeds, printing, and the README screenshot. */
+    body { background: #070b16; }
+    .card-only { max-width: 820px; margin: 0 auto; padding: 20px; }
+    .pass-slot { margin-top: 0; }
+  </style>
+</head>
+<body>
+  <main class="card-only">
+    <section id="pass" class="pass-slot" aria-live="polite"></section>
+  </main>
+  <script type="module">
+    import { composePass, OCCASIONS } from './js/compose.js';
+    import { renderPass } from './js/render.js';
+
+    const p = new URLSearchParams(location.search);
+    const d = /^\d{8}$/.test(p.get('d') || '') ? p.get('d') : '20010101';
+    const occasion = OCCASIONS[p.get('o')] ? p.get('o') : 'birthday';
+    const hemisphere = ['north', 'south'].includes(p.get('h')) ? p.get('h') : 'skip';
+
+    const pass = await composePass({
+      year: Number(d.slice(0, 4)), month: Number(d.slice(4, 6)), day: Number(d.slice(6, 8)),
+      occasion, hemisphere,
+    });
+    renderPass(pass, document.getElementById('pass'));
+    document.title = `${pass.identity.fullName} · Born Among Stars`;
+    // Wait for the destination photo so screenshots never catch a blank hero.
+    const img = document.querySelector('.pass__photo');
+    if (img && !img.complete) await new Promise((r) => { img.onload = r; img.onerror = r; });
+    // Expose the rendered height so a headless capture can size itself exactly.
+    document.documentElement.dataset.cardHeight = String(document.querySelector('.pass').offsetHeight);
+    document.documentElement.dataset.ready = '1';
+  </script>
+</body>
+</html>

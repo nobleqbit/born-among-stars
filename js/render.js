@@ -70,7 +70,7 @@ export function renderPass(pass, root) {
       <div class="pass__body">
         <aside class="pass__aside">
           <section class="ident">
-            <div class="pass__eyebrow">Cosmic identity</div>
+            <div class="pass__eyebrow">Your papers, please</div>
             <h4 class="ident__callsign">${esc(id.fullName)}</h4>
             <code class="ident__code">${esc(id.designation)}</code>
             <ol class="ident__addr" aria-label="Cosmic address">
@@ -79,7 +79,7 @@ export function renderPass(pass, root) {
             <span class="stamp">Assigned to ${esc(d.forWho)}</span>
           </section>
           <section class="blk">
-            <span class="blk__k">Cosmic odometer</span>
+            <span class="blk__k">Laps around the Sun</span>
             <ul class="odo">
               ${pass.odometer.map((o) => `<li><span>${esc(o.name)} orbits</span><b>${esc(o.orbitsLabel)}</b></li>`).join('')}
             </ul>
@@ -106,17 +106,17 @@ export function renderPass(pass, root) {
 
       <details class="pass__more">
         <summary class="pass__summary">
-          <span>More about your destination</span>
-          <span class="summary__hint">facts · next orbit · the number · quantum · forward vector</span>
+          <span>The rest of the manifest</span>
+          <span class="summary__hint">three true things · your next cosmic birthday · your number · physics · where to point next</span>
         </summary>
         <div class="more">
-          ${tile('Three facts', `<ul class="tile__facts">${d.facts.map((f) => `<li>${esc(f)}</li>`).join('')}</ul>`)}
-          ${tile('Next orbit', `<p>${esc(pass.nextOrbit.line)}</p>${pass.smile[0] ? `<p class="tile__small">${esc(pass.smile[0])}</p>` : ''}`)}
-          ${tile('The number itself', `<p>${esc(pass.number.note)}</p><p class="tile__small">${esc(pass.number.rootLine)}</p>`)}
-          ${tile('Quantum note', `<p>${esc(pass.quantum)}</p>`)}
-          ${tile('Strength', `<p>${esc(d.strength)}</p>`)}
-          ${tile('Constructive', `<p>${esc(d.caution)}</p>`)}
-          ${tile('Forward vector', `<p class="tile__forward">${esc(d.forward)}</p>${pass.smile[1] ? `<p class="tile__small">${esc(pass.smile[1])}</p>` : ''}`, true)}
+          ${tile('Three true things', `<ul class="tile__facts">${d.facts.map((f) => `<li>${esc(f)}</li>`).join('')}</ul>`)}
+          ${tile('Your next cosmic birthday', `<p>${esc(pass.nextOrbit.line)}</p>${pass.smile[0] ? `<p class="tile__small">${esc(pass.smile[0])}</p>` : ''}`)}
+          ${tile('Your number, dissected', `<p>${esc(pass.number.note)}</p><p class="tile__small">${esc(pass.number.rootLine)}</p>`)}
+          ${tile('Physics, lightly misused', `<p>${esc(pass.quantum)}</p>`)}
+          ${tile('What you’ve got', `<p>${esc(d.strength)}</p>`)}
+          ${tile('The fine print', `<p>${esc(d.caution)}</p>`)}
+          ${tile('Where to point next', `<p class="tile__forward">${esc(d.forward)}</p>${pass.smile[1] ? `<p class="tile__small">${esc(pass.smile[1])}</p>` : ''}`, true)}
         </div>
       </details>
     </article>
