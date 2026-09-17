@@ -78,7 +78,7 @@ There is no backend. The page is static HTML/JS served from GitHub Pages; all co
 
 We never ask for a name, so the card issues one — deterministically, from the same SHA-256 as the destination:
 
-- **Callsign** — the hash bytes (from byte 8 onward) pick 2 or 3 syllables from a fixed table of 32 (`ve la ri so ne ka tho zar …`), capitalised; a small blocklist rejects unfortunate collisions and moves to the next byte. Same date and occasion → same callsign, forever. The full name is `<callsign> of <destination>`.
+- **Callsign** — the hash bytes (from byte 8 onward) build 2 or 3 strict consonant–vowel syllables (onsets `v l r s n k th z d m t sh f h c ly`, vowels weighted toward `a e o`, an occasional vowel-initial opener like `Or-`/`El-`) plus one soft ending (`-n -r -th -s -l -ne -ra -na`). The construction guarantees no vowel pile-ups or consonant clusters, never echoes a consonant or vowel across consecutive syllables, never stacks two sibilants, and never uses a letter more than twice; a length check (4–8 letters) and a blocklist of real words and near-words reject the rest and move to the next bytes. Same date and occasion → same callsign, forever. The full name is `<callsign> of <destination>`.
 - **Designation** — `BAS-<JDN>-<DESTINATION ID>`, e.g. `BAS-2447965-IO`. Plain concatenation; readable as a catalogue entry.
 - **Address** — seven lines running outward, and every line past the first two is real: your destination; `Orbit N of Jupiter` (whole Jupiter orbits you've completed) and `Sector D` (your digital root); **the Solar System, Orion Arm** (the Sun really does sit in the Orion–Cygnus Arm); **the Milky Way, Local Group**; **Laniakea Supercluster** (our home supercluster, mapped in 2014); **the Observable Universe**.
 

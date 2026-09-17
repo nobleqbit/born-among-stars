@@ -33,22 +33,64 @@ const QUANTUM_LINES = [
 // plus a catalogue-style designation and an address that runs outward from
 // the destination to the edge of the observable universe.
 
-const SYLLABLES = ['ve', 'la', 'ri', 'so', 'ne', 'ka', 'tho', 'zar', 'mi', 'del', 'or', 'an',
-  'el', 'ys', 'ta', 'lu', 'no', 'sa', 'vi', 'ren', 'ith', 'dra', 'lo', 'um', 'ar', 'es', 'on',
-  'ia', 'ur', 'tel', 'ma', 'is'];
-// Guard against accidental unfortunate syllable collisions.
-const BLOCKLIST = ['sex', 'ass', 'tit', 'cum', 'fag', 'nig', 'cok', 'dic', 'fuk', 'shi', 'kil'];
+// Names are built as strict consonant–vowel syllables (plus one soft ending),
+// so a vowel never lands next to another vowel across a boundary and no hard
+// consonant clusters form. "Vitho", "Soren", "Kaleth" — never "Viur".
+const ONSETS = ['v', 'l', 'r', 's', 'n', 'k', 'th', 'z', 'd', 'm', 't', 'sh', 'f', 'h'];
+const SINGLE_ONSETS = ONSETS.filter((c) => c.length === 1);
+const SIBILANTS = new Set(['s', 'sh', 'th', 'z']);
+const VOWELS = ['a', 'e', 'i', 'o', 'u', 'a', 'e', 'o']; // weighted toward open vowels
+const OPENERS = ['Or', 'El', 'An', 'Il', 'Ar', 'Es']; // occasional vowel-initial first syllable
+const ENDINGS = ['n', 'r', 'th', 'l', 'ne', 'ra', 'na', 'n', 'r', ''];
+// Real words and near-words a random generator must never produce.
+const BLOCKLIST = ['sex', 'ass', 'tit', 'cum', 'fag', 'nig', 'cok', 'dic', 'fuk', 'shi', 'kil',
+  'anal', 'anus', 'arso', 'semen', 'samen', 'satan', 'nazi', 'rape', 'hell', 'porn', 'dildo',
+  'moron', 'loser', 'fart', 'poop', 'meth', 'thater', 'damn', 'shat', 'turd', 'vomit', 'hate',
+  'dead', 'death', 'dumb', 'fool'];
 
 function cosmicCallsign(hex, start = 8) {
   const bytes = hex.match(/.{2}/g).map((h) => parseInt(h, 16));
-  for (let attempt = 0; attempt < 8; attempt++) {
-    const count = 2 + (bytes[(start + attempt) % bytes.length] % 2); // 2 or 3 syllables
+  const at = (i) => bytes[(start + i) % bytes.length];
+  for (let attempt = 0; attempt < 10; attempt++) {
+    const o = attempt * 7;
+    const count = at(o) % 10 < 7 ? 2 : 3; // mostly two syllables; three stay rare
     let name = '';
+    let afterOpener = false;
+    let prevOnset = null;
+    let prevVowel = null;
     for (let i = 0; i < count; i++) {
-      name += SYLLABLES[bytes[(start + attempt + 1 + i * 3) % bytes.length] % SYLLABLES.length];
+      if (i === 0 && at(o + 1) % 4 === 0) {
+        name += OPENERS[at(o + 2) % OPENERS.length];
+        afterOpener = true;
+        continue;
+      }
+      // An opener already ends in a consonant, so the next onset must be a
+      // single letter — otherwise "Es" + "sha" piles up three consonants.
+      const onsets = afterOpener ? SINGLE_ONSETS : ONSETS;
+      let oi = at(o + 2 + i * 2) % onsets.length;
+      // Don't echo the previous consonant, and don't stack sibilants
+      // ("Fofar", "Thashene"): step to the next onset until it's clean.
+      for (let k = 0; k < onsets.length; k++) {
+        const c = onsets[(oi + k) % onsets.length];
+        if (c !== prevOnset && !(SIBILANTS.has(c) && SIBILANTS.has(prevOnset))) { oi = (oi + k) % onsets.length; break; }
+      }
+      let vi = at(o + 3 + i * 2) % VOWELS.length;
+      if (VOWELS[vi] === prevVowel) vi = (vi + 1) % VOWELS.length; // "Tonenin", "Metanan"
+      name += onsets[oi] + VOWELS[vi];
+      prevOnset = onsets[oi];
+      prevVowel = VOWELS[vi];
+      afterOpener = false;
     }
+    name += ENDINGS[at(o + 6) % ENDINGS.length];
     name = name[0].toUpperCase() + name.slice(1);
-    if (!BLOCKLIST.some((b) => name.toLowerCase().includes(b))) return name;
+    const lower = name.toLowerCase();
+    const letterCounts = {};
+    for (const ch of lower) letterCounts[ch] = (letterCounts[ch] || 0) + 1;
+    const ok = name.length >= 4 && name.length <= 8           // crisp: "Thanera", never "Shuhavora"
+      && !/[aeiou]{3}/.test(lower)                       // no vowel pile-ups
+      && Math.max(...Object.values(letterCounts)) <= 2     // no letter more than twice
+      && !BLOCKLIST.some((b) => lower.includes(b));
+    if (ok) return name;
   }
   return 'Orion';
 }

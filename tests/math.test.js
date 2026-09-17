@@ -110,6 +110,22 @@ test('composePass assembles a full card', async () => {
   assert.equal(pass.image, `img/${pass.destination.id}.jpg`);
 });
 
+test('callsigns are pronounceable across many dates', async () => {
+  // Strict consonant–vowel construction: no vowel pile-ups, no hard clusters,
+  // 4–9 letters, capitalised. Sample a spread of dates.
+  for (let i = 0; i < 120; i++) {
+    const y = 1950 + (i % 70);
+    const m = 1 + (i % 12);
+    const d = 1 + (i % 28);
+    const p = await composePass({ year: y, month: m, day: d, occasion: 'birthday' });
+    const n = p.identity.callsign;
+    assert.match(n, /^[A-Z][a-z]{3,7}$/, `bad shape: ${n}`);
+    assert.doesNotMatch(n.toLowerCase(), /arso|semen|satan/, `blocked word leaked: ${n}`);
+    assert.doesNotMatch(n.toLowerCase(), /[aeiou]{3}/, `vowel pile-up: ${n}`);
+    assert.doesNotMatch(n.toLowerCase(), /[bcdfghjklmnpqrstvwxz]{3}/, `consonant cluster: ${n}`);
+  }
+});
+
 test('cosmic identity is deterministic', async () => {
   const a = await composePass({ year: 2001, month: 9, day: 9, occasion: 'milestone' });
   const b = await composePass({ year: 2001, month: 9, day: 9, occasion: 'milestone' });

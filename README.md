@@ -2,6 +2,10 @@
 
 **Give a date. Get a cosmic boarding pass.**
 
+### ▶ Try it now: **https://nobleqbit.github.io/born-among-stars/**
+
+Nothing to install, no account, nothing leaves your browser. Pick a date, get your destination, callsign, and address in the cosmos — then share the link or download the card.
+
 Pick a birthday, an anniversary, a milestone — any day that matters. The site turns it into an astronomer's day-number, runs the real orbital mechanics on it, finds the star whose light from that day is arriving *right now*, and assigns you a destination somewhere in the universe — a moon, a probe, a particle, a void — with a reason you were sent there and a transmission for the year ahead.
 
 It is meant to make someone feel seen, and then smile.
