@@ -100,4 +100,28 @@ test('composePass assembles a full card', async () => {
   assert.ok(pass.quantum);
   assert.match(pass.seasonLine, /spring/);
   assert.equal(pass.permalink.d, '19900314');
+  // Cosmic identity: pronounceable callsign, designation, 7-line address.
+  assert.match(pass.identity.callsign, /^[A-Z][a-z]{3,}$/);
+  assert.equal(pass.identity.fullName, `${pass.identity.callsign} of ${pass.destination.name}`);
+  assert.match(pass.identity.designation, /^BAS-2447965-[A-Z0-9]+$/);
+  assert.equal(pass.identity.address.length, 7);
+  assert.equal(pass.identity.address.at(-1), 'The Observable Universe');
+  assert.equal(pass.image, `img/${pass.destination.id}.jpg`);
+});
+
+test('cosmic identity is deterministic', async () => {
+  const a = await composePass({ year: 2001, month: 9, day: 9, occasion: 'milestone' });
+  const b = await composePass({ year: 2001, month: 9, day: 9, occasion: 'milestone' });
+  assert.equal(a.identity.fullName, b.identity.fullName);
+  const c = await composePass({ year: 2001, month: 9, day: 10, occasion: 'milestone' });
+  assert.notEqual(a.identity.designation, c.identity.designation);
+});
+
+test('every destination has a bundled image and a credit', async () => {
+  const { existsSync } = await import('node:fs');
+  const { IMAGE_CREDITS } = await import('../js/images.js');
+  for (const b of CATALOG) {
+    assert.ok(existsSync(new URL(`../img/${b.id}.jpg`, import.meta.url)), `missing img/${b.id}.jpg`);
+    assert.ok(IMAGE_CREDITS[b.id]?.credit, `missing credit for ${b.id}`);
+  }
 });

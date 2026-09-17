@@ -27,6 +27,32 @@ const QUANTUM_LINES = [
   'The vacuum is never empty; it flickers with things that almost happened. Some of your almosts are still flickering. Fund one.',
 ];
 
+// ── Cosmic identity ───────────────────────────────────────────────────────
+// We never ask for a name, so we issue one: a pronounceable callsign built
+// from the signature bytes (deterministic — same date, same name forever),
+// plus a catalogue-style designation and an address that runs outward from
+// the destination to the edge of the observable universe.
+
+const SYLLABLES = ['ve', 'la', 'ri', 'so', 'ne', 'ka', 'tho', 'zar', 'mi', 'del', 'or', 'an',
+  'el', 'ys', 'ta', 'lu', 'no', 'sa', 'vi', 'ren', 'ith', 'dra', 'lo', 'um', 'ar', 'es', 'on',
+  'ia', 'ur', 'tel', 'ma', 'is'];
+// Guard against accidental unfortunate syllable collisions.
+const BLOCKLIST = ['sex', 'ass', 'tit', 'cum', 'fag', 'nig', 'cok', 'dic', 'fuk', 'shi', 'kil'];
+
+function cosmicCallsign(hex, start = 8) {
+  const bytes = hex.match(/.{2}/g).map((h) => parseInt(h, 16));
+  for (let attempt = 0; attempt < 8; attempt++) {
+    const count = 2 + (bytes[(start + attempt) % bytes.length] % 2); // 2 or 3 syllables
+    let name = '';
+    for (let i = 0; i < count; i++) {
+      name += SYLLABLES[bytes[(start + attempt + 1 + i * 3) % bytes.length] % SYLLABLES.length];
+    }
+    name = name[0].toUpperCase() + name.slice(1);
+    if (!BLOCKLIST.some((b) => name.toLowerCase().includes(b))) return name;
+  }
+  return 'Orion';
+}
+
 function season(month, hemisphere) {
   const north = ['winter', 'winter', 'spring', 'spring', 'spring', 'summer',
     'summer', 'summer', 'autumn', 'autumn', 'autumn', 'winter'][month - 1];
@@ -102,11 +128,33 @@ export async function composePass(input) {
   const dateLabel = `${day} ${MONTHS[month - 1]} ${year}`;
   const weekday = weekdayOf(jdn);
 
+  const callsign = cosmicCallsign(sig.hex);
+  const fullName = `${callsign} of ${body.name}`;
+  const jupiterOrbitsDone = Math.floor(pick('Jupiter').orbits);
+
   return {
     occasion: occ,
     date: { year, month, day, label: dateLabel, weekday },
     jdn,
     signature: sig.code,
+    identity: {
+      callsign,
+      fullName,
+      designation: `BAS-${jdn}-${body.id.toUpperCase().replace(/-/g, '')}`,
+      // Real all the way out: the Sun sits in the Orion Arm, the Milky Way in
+      // the Local Group, which belongs to the Laniakea Supercluster.
+      address: [
+        fullName,
+        `${body.name}, ${body.kind}`,
+        `Orbit ${jupiterOrbitsDone} of Jupiter · Sector ${profile.digitalRoot}`,
+        'The Solar System, Orion Arm',
+        'The Milky Way, Local Group',
+        'Laniakea Supercluster',
+        'The Observable Universe',
+      ],
+      line: `No name required — the cosmos issued you one. From today you travel as ${fullName}.`,
+    },
+    image: `img/${body.id}.jpg`,
     daysAlive,
     ageYears,
     destination: body,
