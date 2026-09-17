@@ -161,8 +161,11 @@ function drawCover(ctx, img, x, y, w, h) {
 
 const PHOTO_H = 440;
 
-/** Draws the pass to a canvas and resolves to a PNG data URL. */
-export async function passToPNG(pass) {
+/** Draws the pass to a canvas and resolves to a JPEG data URL.
+ *  JPEG (q=0.88) keeps the text crisp and lands around 250–350 KB with the
+ *  photo, versus ~1.2 MB as PNG — a far better thing to share. */
+export const SHARE_IMAGE_EXT = 'jpg';
+export async function passToImage(pass) {
   const W = 1200;
   const pad = 64;
   const maxW = W - pad * 2;
@@ -262,5 +265,5 @@ export async function passToPNG(pass) {
     ctx.textBaseline = 'top';
     b.lines.forEach((line, i) => ctx.fillText(line, pad, b.y + i * b.lh));
   }
-  return canvas.toDataURL('image/png');
+  return canvas.toDataURL('image/jpeg', 0.88);
 }

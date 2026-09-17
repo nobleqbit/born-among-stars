@@ -78,7 +78,7 @@ js/astronomy.js     periods, day-lengths, star distances, light-mail
 js/catalog.js       the 37 destinations (the soul of it)
 js/signature.js     SHA-256 → SIG + catalog index
 js/compose.js       inputs → complete pass object
-js/render.js        DOM rendering + PNG export
+js/render.js        DOM rendering + JPEG share-image export
 js/main.js          UI, permalinks, starfield
 js/images.js        credit / license / source for every bundled image
 img/                one photo per destination, served same-origin

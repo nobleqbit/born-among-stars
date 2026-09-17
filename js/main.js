@@ -1,7 +1,7 @@
 // UI wiring. Nothing here ever leaves the browser.
 
 import { composePass, OCCASIONS } from './compose.js';
-import { renderPass, passToPNG } from './render.js';
+import { renderPass, passToImage, SHARE_IMAGE_EXT } from './render.js';
 import { julianDayNumber, fromJulianDayNumber } from './julian.js';
 
 const $ = (sel) => document.querySelector(sel);
@@ -91,8 +91,8 @@ $('#download').addEventListener('click', async () => {
   if (!current) return;
   status.textContent = 'Rendering your pass…';
   const a = document.createElement('a');
-  a.href = await passToPNG(current);
-  a.download = `born-among-stars-${current.permalink.d}-${current.destination.id}.png`;
+  a.href = await passToImage(current);
+  a.download = `born-among-stars-${current.permalink.d}-${current.destination.id}.${SHARE_IMAGE_EXT}`;
   a.click();
   status.textContent = '';
 });
