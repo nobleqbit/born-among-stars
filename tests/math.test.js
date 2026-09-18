@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {
   julianDayNumber, fromJulianDayNumber, primeFactors, digitalRoot, numberProfile, weekdayOf,
 } from '../js/julian.js';
-import { lightMail, cosmicOdometer, nextWholeOrbit, yearsFromDays } from '../js/astronomy.js';
+import { lightMail, cosmicOdometer, nextWholeOrbit, yearsFromDays, moonPhase, birthdayBroadcast } from '../js/astronomy.js';
 import { cosmicSignature } from '../js/signature.js';
 import { composePass } from '../js/compose.js';
 import { CATALOG } from '../js/catalog.js';
@@ -66,6 +66,40 @@ test('next whole orbit is always in the future', () => {
   assert.ok(n.inDays > 0 && n.inDays <= 87.969); // Mercury is never more than one orbit away
 });
 
+test('moon phase: the reference new moon and the full moon a fortnight later', () => {
+  // 6 Jan 2000 was a new moon (18:14 UTC); 21 Jan 2000 was a full moon (04:40 UTC).
+  const newMoon = moonPhase(julianDayNumber(2000, 1, 6));
+  assert.equal(newMoon.name, 'New Moon');
+  assert.ok(newMoon.illumination < 0.02);
+  const full = moonPhase(julianDayNumber(2000, 1, 21));
+  assert.equal(full.name, 'Full Moon');
+  assert.ok(full.illumination > 0.98);
+  // Half-way points are quarters. The mean-lunation method can be ~a day off
+  // the true phase (this lunation ran long), so allow a generous window.
+  const q = moonPhase(julianDayNumber(2000, 1, 14)); // first quarter was 14 Jan 2000, 13:34 UTC
+  assert.equal(q.name, 'First Quarter');
+  assert.ok(Math.abs(q.illumination - 0.5) < 0.15);
+});
+
+test('moon phase illumination is bounded and phase is in [0,1)', () => {
+  for (let jdn = 2440000; jdn < 2440000 + 60; jdn++) {
+    const m = moonPhase(jdn);
+    assert.ok(m.phase >= 0 && m.phase < 1);
+    assert.ok(m.illumination >= 0 && m.illumination <= 1);
+    assert.ok(m.name);
+  }
+});
+
+test('birthday broadcast brackets the age between two stars', () => {
+  const b = birthdayBroadcast(36.51);
+  assert.equal(b.last.name, 'Pollux');       // 33.8 ly, already passed
+  assert.equal(b.next.name, 'Arcturus');     // 36.7 ly, next up
+  assert.ok(b.nextInYears > 0 && b.nextInYears < 0.2);
+  const baby = birthdayBroadcast(2);
+  assert.equal(baby.last, null);
+  assert.equal(baby.next.name, 'Proxima Centauri');
+});
+
 test('signature is deterministic and maps into the catalog', async () => {
   const a = await cosmicSignature(2447965, 'birthday', CATALOG.length);
   const b = await cosmicSignature(2447965, 'birthday', CATALOG.length);
@@ -108,6 +142,13 @@ test('composePass assembles a full card', async () => {
   assert.equal(pass.identity.address.length, 7);
   assert.equal(pass.identity.address.at(-1), 'The Observable Universe');
   assert.equal(pass.image, `img/${pass.destination.id}.jpg`);
+  // New card content: moon, broadcast, and the working.
+  assert.ok(pass.moon.name && pass.moon.percent >= 0 && pass.moon.percent <= 100);
+  assert.match(pass.lightMail.broadcast, /light-years out/);
+  assert.match(pass.lightMail.broadcast, /Pollux/);
+  assert.ok(pass.working.some((l) => l.includes('= 2447965')), 'working shows the JDN derivation');
+  assert.ok(pass.working.some((l) => l.includes('5 × 13 × 13 × 2897')));
+  assert.ok(pass.working.some((l) => l.includes('→ Io')));
 });
 
 test('callsigns are pronounceable across many dates', async () => {

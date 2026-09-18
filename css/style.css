@@ -44,6 +44,11 @@ body {
   font: 700 clamp(40px, 7vw, 64px)/1.05 var(--serif);
   margin: 8px 0 16px; letter-spacing: -0.01em;
 }
+.hero__epigraph {
+  font: italic 400 clamp(16px, 2.4vw, 19px)/1.45 var(--serif); color: var(--ink-2);
+  max-width: 560px; margin: -4px auto 22px;
+}
+.hero__epigraph span { font-style: normal; font: 600 11px/1 var(--mono); letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-left: 6px; white-space: nowrap; }
 .hero__lede { color: var(--ink-2); max-width: 640px; margin: 0 auto 14px; }
 .hero__privacy { color: var(--muted); font-size: 15px; max-width: 640px; margin: 0 auto; }
 .hero__privacy strong { color: var(--ink); }
@@ -183,6 +188,8 @@ select:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
 .field__k { font-size: 10.5px; margin-bottom: 2px; }
 .field__v { font: 500 14px/1.35 var(--mono); color: var(--ink); overflow-wrap: anywhere; margin: 0; }
 .field__v small { display: block; font: 400 12px/1.4 var(--sans); color: var(--muted); }
+.field__moon { display: inline-flex; align-items: center; gap: 7px; }
+.field__moon .moon { flex: 0 0 auto; filter: drop-shadow(0 0 4px rgba(232, 237, 243, 0.35)); }
 
 /* ── Body: main + aside ──────────────────────────────────────────────── */
 .pass__body {
@@ -195,6 +202,7 @@ select:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
 .blk:last-child { margin-bottom: 0; }
 .blk__k { display: block; margin-bottom: 4px; }
 .pass__grit { font-size: 16.5px; line-height: 1.5; color: var(--ink); }
+.pass__broadcast { color: var(--ink-2); font-size: 14px; }
 .pass__tx { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--line-soft); }
 .pass__tx blockquote {
   margin: 4px 0 0; font: italic 700 clamp(19px, 3.2vw, 23px)/1.3 var(--serif); color: var(--gold);
@@ -277,6 +285,24 @@ select:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
 .tile__facts li { margin-bottom: 5px; }
 .tile__small { font-size: 13px; color: var(--muted); margin-top: 6px; }
 .tile__forward { font-size: 16.5px; color: var(--ink); }
+
+/* "Show the working": the card's arithmetic, laid bare */
+.tile--working { padding: 0; }
+.working__summary {
+  list-style: none; cursor: pointer; user-select: none;
+  display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; padding: 14px 16px;
+}
+.working__summary::-webkit-details-marker { display: none; }
+.working__summary .tile__k { margin: 0; }
+.working__summary .tile__small { margin: 0; }
+.working__summary:hover { background: rgba(143, 179, 255, 0.05); }
+.working__summary:focus-visible { outline: 2px solid var(--accent); outline-offset: -3px; }
+.working__pre {
+  margin: 0; padding: 4px 16px 16px; overflow-x: auto;
+  font: 12.5px/1.6 var(--mono); color: var(--ink-2); white-space: pre;
+  font-variant-numeric: tabular-nums;
+}
+@media (min-width: 640px) { .working__summary { padding: 14px 18px; } .working__pre { padding: 4px 18px 18px; } }
 
 /* ── Actions / footer ────────────────────────────────────────────────── */
 .actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 18px; align-items: center; }

@@ -4,6 +4,7 @@
 import { julianDayNumber, todayJDN, numberProfile, weekdayOf } from './julian.js';
 import {
   yearsFromDays, cosmicOdometer, localDaysLived, lightMail, nextWholeOrbit,
+  moonPhase, birthdayBroadcast, DAYS_PER_YEAR, SYNODIC_MONTH, REFERENCE_NEW_MOON_JD,
 } from './astronomy.js';
 import { cosmicSignature } from './signature.js';
 import { CATALOG, CATALOG_SIZE } from './catalog.js';
@@ -169,6 +170,49 @@ export async function composePass(input) {
 
   const lm = lightMail(ageYears);
 
+  // The Moon that night, and where the light that left Earth that day is now.
+  const moon = moonPhase(jdn);
+  const bc = birthdayBroadcast(ageYears);
+  const broadcastLine = bc.last
+    ? `Meanwhile the light — and the radio — that left Earth the day you were ${occ.dateWord} is ${fmt(ageYears, 1)} light-years out. It passed ${bc.last.name} about ${bc.lastYearsAgo < 1 ? 'this year' : fmt(bc.lastYearsAgo) + (bc.lastYearsAgo < 2 ? ' year ago' : ' years ago')}${bc.next ? `; it reaches ${bc.next.name} in ${bc.nextInYears < 1 ? 'less than a year' : fmt(bc.nextInYears) + (bc.nextInYears < 2 ? ' year' : ' years')}.` : '.'}`
+    : `Meanwhile the light that left Earth the day you were ${occ.dateWord} is ${fmt(ageYears, 1)} light-years out — it hasn't reached the nearest star yet. Proxima Centauri is ${bc.next.ly} light-years away; your broadcast arrives there in ${fmt(bc.nextInYears, 1)} years.`;
+
+  // "Show the working": the actual arithmetic behind this card, numbers in.
+  const a = Math.floor((14 - month) / 12);
+  const yy = year + 4800 - a;
+  const mm = month + 12 * a - 3;
+  const cycles = (jdn + 0.5 - REFERENCE_NEW_MOON_JD) / SYNODIC_MONTH;
+  const working = [
+    `Julian Day Number`,
+    `  a = floor((14 − ${month}) / 12) = ${a}`,
+    `  y = ${year} + 4800 − ${a} = ${yy}`,
+    `  m = ${month} + 12·${a} − 3 = ${mm}`,
+    `  JDN = ${day} + floor((153·${mm} + 2)/5) + 365·${yy} + floor(${yy}/4) − floor(${yy}/100) + floor(${yy}/400) − 32045`,
+    `      = ${day} + ${Math.floor((153 * mm + 2) / 5)} + ${365 * yy} + ${Math.floor(yy / 4)} − ${Math.floor(yy / 100)} + ${Math.floor(yy / 400)} − 32045 = ${jdn}`,
+    `  weekday = ${jdn} mod 7 = ${jdn % 7} → ${weekdayOf(jdn)}`,
+    ``,
+    `Days alive`,
+    `  today (JDN ${today}) − ${jdn} = ${daysAlive} days ÷ ${DAYS_PER_YEAR} = ${ageYears.toFixed(2)} years`,
+    ``,
+    `The number itself`,
+    `  ${jdn} = ${profile.factorString}`,
+    `  digital root: 1 + (${jdn} − 1) mod 9 = ${profile.digitalRoot}`,
+    ``,
+    `Cosmic odometer`,
+    ...odometer.map((o) => `  ${daysAlive} ÷ ${o.periodDays} = ${o.orbits.toFixed(2)} ${o.name} orbits`),
+    ``,
+    `Light-mail`,
+    `  nearest star to ${ageYears.toFixed(2)} ly: ${lm.star.name} at ${lm.star.ly} ly (|Δ| = ${Math.abs(lm.departedAgeYears).toFixed(2)} yr)`,
+    ``,
+    `The Moon that night`,
+    `  (${jdn} + 0.5 − ${REFERENCE_NEW_MOON_JD}) ÷ ${SYNODIC_MONTH} = ${cycles.toFixed(3)} lunations`,
+    `  fractional part ${moon.phase.toFixed(3)} → ${moon.name}; illumination (1 − cos 2πφ)/2 = ${Math.round(moon.illumination * 100)}%`,
+    ``,
+    `Destination`,
+    `  SHA-256("born-among-stars|${jdn}|${occasion}") = ${sig.hex.slice(0, 16)}…`,
+    `  0x${sig.hex.slice(0, 8)} mod ${CATALOG_SIZE} = ${sig.index} → ${body.name}`,
+  ];
+
   const dateLabel = `${day} ${MONTHS[month - 1]} ${year}`;
   const weekday = weekdayOf(jdn);
 
@@ -218,7 +262,13 @@ export async function composePass(input) {
         ? `Sunlight takes ${fmt(body.lightMinutes, 1)} minutes to reach ${body.name}. Your card took less.`
         : null,
     ].filter(Boolean),
-    lightMail: { ...lm, line: lightMailLine(lm, year, occ.dateWord) },
+    lightMail: { ...lm, line: lightMailLine(lm, year, occ.dateWord), broadcast: broadcastLine },
+    moon: {
+      ...moon,
+      percent: Math.round(moon.illumination * 100),
+      label: `${moon.name} · ${Math.round(moon.illumination * 100)}% lit`,
+    },
+    working,
     quantum: QUANTUM_LINES[sig.salt % QUANTUM_LINES.length],
     seasonLine:
       hemisphere === 'north' || hemisphere === 'south'

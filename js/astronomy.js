@@ -123,3 +123,48 @@ export function nextWholeOrbit(daysAlive) {
   }
   return soonest;
 }
+
+// ── Moon phase ────────────────────────────────────────────────────────────
+// Mean synodic month and a reference new moon: 6 January 2000, 18:14 UTC,
+// which is Julian Date 2451550.26 (JD 2451550.0 = noon that day).
+// A mean-lunation calculation ignores the Moon's uneven orbital speed, so
+// it can be up to about a day off the true phase — plenty for naming the
+// phase and quoting illumination to the nearest few percent.
+export const SYNODIC_MONTH = 29.530588853;
+export const REFERENCE_NEW_MOON_JD = 2451550.26;
+
+// Primary phases (new, quarters, full) get a ±0.0375-cycle window (~1.1 days),
+// which absorbs the mean-vs-true lunation drift of the simple method.
+const PHASE_NAMES = [
+  [0.0375, 'New Moon'], [0.2125, 'Waxing Crescent'], [0.2875, 'First Quarter'],
+  [0.4625, 'Waxing Gibbous'], [0.5375, 'Full Moon'], [0.7125, 'Waning Gibbous'],
+  [0.7875, 'Last Quarter'], [0.9625, 'Waning Crescent'], [1.0001, 'New Moon'],
+];
+
+/** Moon phase at noon on a Julian Day Number. */
+export function moonPhase(jdn) {
+  const cycles = (jdn + 0.5 - REFERENCE_NEW_MOON_JD) / SYNODIC_MONTH;
+  const phase = cycles - Math.floor(cycles); // 0 = new, 0.5 = full
+  const illumination = (1 - Math.cos(2 * Math.PI * phase)) / 2;
+  const name = PHASE_NAMES.find(([upTo]) => phase < upTo)[1];
+  return { phase, illumination, name, waxing: phase < 0.5, cycles };
+}
+
+// ── Birthday broadcast ────────────────────────────────────────────────────
+/**
+ * Light (and radio) that left Earth on the birth date is now `ageYears`
+ * light-years out. Which star did it pass most recently, and which is next?
+ */
+export function birthdayBroadcast(ageYears) {
+  const sorted = [...STARS].sort((a, b) => a.ly - b.ly);
+  const passed = sorted.filter((s) => s.ly <= ageYears);
+  const last = passed[passed.length - 1] || null;
+  const next = sorted.find((s) => s.ly > ageYears) || null;
+  return {
+    distanceLy: ageYears,
+    last,
+    lastYearsAgo: last ? ageYears - last.ly : null,
+    next,
+    nextInYears: next ? next.ly - ageYears : null,
+  };
+}

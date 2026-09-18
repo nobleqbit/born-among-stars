@@ -9,6 +9,25 @@ import { IMAGE_CREDITS } from './images.js';
 
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
+/**
+ * A small SVG moon at a given phase (0 = new, 0.5 = full). The terminator is
+ * an ellipse whose x-radius is |cos 2πφ|; which side is lit follows waxing.
+ */
+export function moonSVG(phase, size = 18) {
+  const r = 10, c = 12;
+  const waxing = phase < 0.5;
+  const rx = Math.abs(Math.cos(2 * Math.PI * phase)) * r;
+  const gibbous = Math.abs(phase - 0.5) < 0.25;
+  // Outer semicircle on the lit limb, then the elliptical terminator back.
+  const limbSweep = waxing ? 1 : 0;
+  const termSweep = gibbous ? (waxing ? 0 : 1) : (waxing ? 1 : 0);
+  const d = `M ${c} ${c - r} A ${r} ${r} 0 0 ${limbSweep} ${c} ${c + r} A ${rx} ${r} 0 0 ${termSweep} ${c} ${c - r} Z`;
+  return `<svg class="moon" width="${size}" height="${size}" viewBox="0 0 24 24" aria-hidden="true">
+    <circle cx="${c}" cy="${c}" r="${r}" fill="#1b2542" stroke="rgba(143,179,255,0.35)" stroke-width="1"/>
+    <path d="${d}" fill="#e8edf3"/>
+  </svg>`;
+}
+
 // A tiny probe: body, two solar panels, a dish. Colours via currentColor + accents.
 const PROBE_SVG = `<svg class="voyage__probe" viewBox="0 0 24 14" aria-hidden="true">
   <rect x="0" y="5.5" width="8" height="3" fill="#8fb3ff"/>
@@ -59,9 +78,9 @@ export function renderPass(pass, root) {
       </div>
 
       <dl class="pass__fields">
-        ${field('Origin', `Earth <small>a ${esc(pass.date.weekday)}</small>`)}
-        ${field('Date', esc(pass.date.label))}
+        ${field('Date', `${esc(pass.date.label)} <small>a ${esc(pass.date.weekday)}, on Earth</small>`)}
         ${field('Julian Day', jdn)}
+        ${field('The Moon that night', `<span class="field__moon">${moonSVG(pass.moon.phase)}<span>${esc(pass.moon.name)}</span></span><small>${pass.moon.percent}% lit</small>`)}
         ${pass.seasonLine
           ? field('Season', esc(pass.seasonShort))
           : field('Assigned to', esc(d.forWho))}
@@ -94,6 +113,7 @@ export function renderPass(pass, root) {
           <section class="blk">
             <span class="blk__k">Light-mail</span>
             <p>${esc(pass.lightMail.line)}</p>
+            <p class="pass__broadcast">${esc(pass.lightMail.broadcast)}</p>
           </section>
           <footer class="pass__tx">
             <div class="pass__eyebrow">Transmission from ${esc(d.name)}</div>
@@ -117,6 +137,12 @@ export function renderPass(pass, root) {
           ${tile('What you’ve got', `<p>${esc(d.strength)}</p>`)}
           ${tile('The fine print', `<p>${esc(d.caution)}</p>`)}
           ${tile('Where to point next', `<p class="tile__forward">${esc(d.forward)}</p>${pass.smile[1] ? `<p class="tile__small">${esc(pass.smile[1])}</p>` : ''}`, true)}
+          <section class="tile tile--wide tile--working">
+            <details class="working">
+              <summary class="working__summary"><span class="tile__k">Show the working</span><span class="tile__small">every number on this card, derived — check it by hand</span></summary>
+              <pre class="working__pre">${esc(pass.working.join('\n'))}</pre>
+            </details>
+          </section>
         </div>
       </details>
     </article>
@@ -183,7 +209,7 @@ export async function passToImage(pass) {
 
   add(`COSMIC BOARDING PASS · ${pass.occasion.label.toUpperCase()}`, `600 18px ${mono}`, '#8fb3ff', 4);
   add(pass.occasion.headline, `700 30px ${serif}`, '#ffffff', 12);
-  add(`Origin: Earth · ${pass.date.label} · Julian Day ${pass.jdn.toLocaleString('en-US')} · SIG ${pass.signature}`, `400 18px ${mono}`, '#9aa4b2', 30);
+  add(`Origin: Earth · ${pass.date.label} · Julian Day ${pass.jdn.toLocaleString('en-US')} · ${pass.moon.label} · SIG ${pass.signature}`, `400 18px ${mono}`, '#9aa4b2', 30);
   add('DESTINATION', `600 18px ${mono}`, '#8fb3ff', 4);
   add(d.name, `700 48px ${serif}`, '#ffd27a', 4);
   add(`${d.kind} — ${d.where}`, `400 22px ${sans}`, '#c9d1dc', 24);
@@ -194,7 +220,8 @@ export async function passToImage(pass) {
   add('WHY YOU WERE SENT HERE', `600 18px ${mono}`, '#8fb3ff', 8);
   add(d.grit, `400 24px ${sans}`, '#e8edf3', 26);
   add('LIGHT-MAIL', `600 18px ${mono}`, '#8fb3ff', 8);
-  add(pass.lightMail.line, `400 24px ${sans}`, '#e8edf3', 30);
+  add(pass.lightMail.line, `400 24px ${sans}`, '#e8edf3', 10);
+  add(pass.lightMail.broadcast, `400 20px ${sans}`, '#c9d1dc', 30);
   add(`TRANSMISSION FROM ${d.name.toUpperCase()}`, `600 18px ${mono}`, '#8fb3ff', 8);
   add(`“${d.transmission}”`, `italic 700 30px ${serif}`, '#ffd27a', 24);
   add('born-among-stars · every number on this card is real and checkable', `400 16px ${mono}`, '#6b7686', 0);

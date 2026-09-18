@@ -58,6 +58,22 @@ Light from a star `d` light-years away left it `d` years ago. So we choose the c
 
 All three are literally true. Distances are rounded published values (Hipparcos/Gaia). The list runs from Proxima Centauri (4.25 ly) to Deneb (2600 ly), spaced so most human ages have a neighbour within a year or two.
 
+### Your birthday broadcast
+
+The mirror image of light-mail. Light and radio that left Earth on your date have travelled `age` light-years by now. We sort the same star table by distance and report the last star that light has already passed (`ly ≤ age`) and the next one it will reach (`ly > age`), with the years since/until. For anyone under 4.25 years the broadcast hasn't reached Proxima Centauri yet, and the card says so.
+
+## 4b. The Moon that night
+
+A mean-lunation calculation. It ignores the Moon's uneven orbital speed, so it can be up to about a day off the true phase — plenty to name the phase and quote illumination to a few percent:
+
+```
+lunations = (JDN + 0.5 − 2451550.26) / 29.530588853
+φ         = lunations − floor(lunations)        0 = new, 0.5 = full
+illum     = (1 − cos 2πφ) / 2
+```
+
+`2451550.26` is the Julian Date of the new moon of 6 January 2000, 18:14 UTC (JD 2451550.0 is noon that day); `29.530588853` days is the mean synodic month. Names follow the usual eight phases with the primary phases (new, quarters, full) given a ±0.0375-cycle window (about 1.1 days), which absorbs the drift between the mean lunation used here and the true one. The little moon drawn on the card uses the same φ: the terminator is an ellipse of x-radius |cos 2πφ|, lit on the right while waxing.
+
 ## 5. The destination (the only random part — and it's not random)
 
 ```
@@ -69,6 +85,10 @@ code  = hash[0:8] + "-" + hash[8:16]   ← printed as SIG on the card
 This is a **fair, reproducible assignment**, not a prediction. The same date and occasion always produce the same destination and the same SIG, so a card can be shared as a link and regenerated identically. Changing the occasion changes the hash, so your birthday and your anniversary land in different places. A second slice of the hash picks the quantum note.
 
 We say this plainly on the site because the delight should come from the real astronomy attached to your date, not from pretending the universe chose you.
+
+## 5b. Show the working
+
+Every card carries a "Show the working" panel under *The rest of the manifest* that prints all of the above with *that card's* numbers substituted — the JDN formula line by line, the factorisation, each odometer division, the light-mail nearest-neighbour test, the lunation arithmetic, and the first 16 hex digits of the hash with the `mod` that picks the destination. Nothing on the card is asserted without the arithmetic being one click away.
 
 ## 6. Privacy, structurally
 

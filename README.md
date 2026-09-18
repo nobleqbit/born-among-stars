@@ -25,7 +25,9 @@ That line is not a metaphor. It is checkable physics, personalised to a date. Th
 | **Julian Day Number** | Your date as the single integer astronomers use | ✅ standard formula |
 | **Destination** | One of 37 hand-written cosmic bodies, each with three true facts and a *grit* narrative — why the universe would send someone there | ✅ facts; assignment by fair hash |
 | **Cosmic odometer** | How many Mercury / Mars / Jupiter / Saturn orbits you've completed, and when your next whole-orbit "birthday" falls | ✅ NASA periods |
-| **Light-mail** | The star whose distance in light-years ≈ your age, and exactly when tonight's light left it | ✅ published distances |
+| **Light-mail** | The star whose distance in light-years ≈ your age, and exactly when tonight's light left it — plus the mirror image: which star the light that left Earth on your date has just passed, and which it reaches next | ✅ published distances |
+| **The Moon that night** | Phase and illumination on your date, drawn | ✅ mean-phase arithmetic |
+| **Show the working** | Every number on the card derived with your values substituted, one click away | ✅ it's the point |
 | **The number itself** | Prime factorisation, digital root, palindrome check of your JDN | ✅ arithmetic |
 | **Quantum note** | One honest piece of quantum mechanics, read as advice | physics, wry |
 | **Strength / Constructive / Forward vector** | The positive read, the shadow of it, and forward-looking guidance from that body | written, not generated |
