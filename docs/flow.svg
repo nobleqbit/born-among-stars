@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="680" height="600" viewBox="0 0 680 600" role="img" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif">
+  <title>How Born Among Stars turns a date into a card</title>
+  <desc>A date becomes a Julian Day Number. From that integer two branches run: real astronomy computed by arithmetic, and a fair SHA-256 hash that picks the destination and callsign. Both feed the card, which renders as HTML, JPEG and a permalink.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M2 1L8 5L2 9" fill="none" stroke="#8b95a5" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+  <rect x="0" y="0" width="680" height="600" rx="16" fill="#070b16"/>
+
+  <g>
+    <rect x="250" y="40" width="180" height="48" rx="6" fill="#111a30" stroke="#8fb3ff" stroke-opacity="0.45"/>
+    <text x="340" y="61" text-anchor="middle" font-size="14" font-weight="600" fill="#e8edf3">Your date</text>
+    <text x="340" y="79" text-anchor="middle" font-size="12" fill="#8b95a5">no name, no account</text>
+  </g>
+  <line x1="340" y1="88" x2="340" y2="118" stroke="#8b95a5" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <g>
+    <rect x="230" y="120" width="220" height="48" rx="6" fill="#221c4a" stroke="#AFA9EC"/>
+    <text x="340" y="141" text-anchor="middle" font-size="14" font-weight="600" fill="#EEEDFE">Julian Day Number</text>
+    <text x="340" y="159" text-anchor="middle" font-size="12" fill="#CECBF6">one integer, e.g. 2,451,911</text>
+  </g>
+  <path d="M330 168 C330 190, 190 186, 190 206" fill="none" stroke="#8b95a5" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <path d="M350 168 C350 190, 490 186, 490 206" fill="none" stroke="#8b95a5" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <g>
+    <rect x="60" y="210" width="260" height="48" rx="6" fill="#0b2e26" stroke="#5DCAA5"/>
+    <text x="190" y="231" text-anchor="middle" font-size="14" font-weight="600" fill="#E1F5EE">Real astronomy</text>
+    <text x="190" y="249" text-anchor="middle" font-size="12" fill="#9FE1CB">arithmetic on that integer</text>
+  </g>
+  <g>
+    <rect x="360" y="210" width="260" height="48" rx="6" fill="#3a1a10" stroke="#F0997B"/>
+    <text x="490" y="231" text-anchor="middle" font-size="14" font-weight="600" fill="#FAECE7">Fair hash</text>
+    <text x="490" y="249" text-anchor="middle" font-size="12" fill="#F5C4B3">SHA-256 of date + occasion</text>
+  </g>
+  <line x1="190" y1="258" x2="190" y2="274" stroke="#5DCAA5" stroke-width="0.75" stroke-dasharray="3 3"/>
+  <line x1="490" y1="258" x2="490" y2="274" stroke="#F0997B" stroke-width="0.75" stroke-dasharray="3 3"/>
+
+  <g fill="#0b2e26" stroke="#5DCAA5" stroke-opacity="0.6">
+    <rect x="60" y="274" width="260" height="30" rx="6"/>
+    <rect x="60" y="308" width="260" height="30" rx="6"/>
+    <rect x="60" y="342" width="260" height="30" rx="6"/>
+  </g>
+  <g font-size="12" fill="#9FE1CB" text-anchor="middle">
+    <text x="190" y="293">Odometer, light-mail, broadcast</text>
+    <text x="190" y="327">Moon phase, Sun's constellation</text>
+    <text x="190" y="361">Prime factors, digital root</text>
+  </g>
+  <g fill="#3a1a10" stroke="#F0997B" stroke-opacity="0.6">
+    <rect x="360" y="274" width="260" height="30" rx="6"/>
+    <rect x="360" y="308" width="260" height="30" rx="6"/>
+    <rect x="360" y="342" width="260" height="30" rx="6"/>
+  </g>
+  <g font-size="12" fill="#F5C4B3" text-anchor="middle">
+    <text x="490" y="293">Destination: 1 of 40 bodies</text>
+    <text x="490" y="327">Callsign and cosmic address</text>
+    <text x="490" y="361">Which quantum note</text>
+  </g>
+
+  <path d="M190 372 C190 396, 300 386, 300 410" fill="none" stroke="#8b95a5" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <path d="M490 372 C490 396, 380 386, 380 410" fill="none" stroke="#8b95a5" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <g>
+    <rect x="230" y="412" width="220" height="48" rx="6" fill="#111a30" stroke="#8fb3ff" stroke-opacity="0.45"/>
+    <text x="340" y="433" text-anchor="middle" font-size="14" font-weight="600" fill="#e8edf3">The card</text>
+    <text x="340" y="451" text-anchor="middle" font-size="12" fill="#8b95a5">written text + your numbers</text>
+  </g>
+  <line x1="340" y1="460" x2="340" y2="488" stroke="#8b95a5" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <g>
+    <rect x="200" y="490" width="280" height="48" rx="6" fill="#111a30" stroke="#ffd27a" stroke-opacity="0.6"/>
+    <text x="340" y="511" text-anchor="middle" font-size="14" font-weight="600" fill="#ffd27a">HTML card, JPEG, permalink</text>
+    <text x="340" y="529" text-anchor="middle" font-size="12" fill="#8b95a5">same date, same card, forever</text>
+  </g>
+
+  <rect x="150" y="560" width="12" height="12" rx="2" fill="#0b2e26" stroke="#5DCAA5"/>
+  <text x="170" y="571" font-size="12" fill="#9FE1CB">real, checkable astronomy</text>
+  <rect x="360" y="560" width="12" height="12" rx="2" fill="#3a1a10" stroke="#F0997B"/>
+  <text x="380" y="571" font-size="12" fill="#F5C4B3">fair hash, not fate</text>
+</svg>

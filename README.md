@@ -18,6 +18,10 @@ It is meant to make someone feel seen, and then smile.
 
 That line is not a metaphor. It is checkable physics, personalised to a date. That's the whole idea.
 
+## How it works
+
+![Flow: your date becomes a Julian Day Number; from it, real astronomy is computed by arithmetic and a fair SHA-256 hash picks the destination and callsign; both feed the card, rendered as HTML, JPEG and a permalink](docs/flow.svg)
+
 ## What's on a card
 
 | Section | What it is | Real? |
