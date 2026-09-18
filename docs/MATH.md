@@ -74,6 +74,21 @@ illum     = (1 − cos 2πφ) / 2
 
 `2451550.26` is the Julian Date of the new moon of 6 January 2000, 18:14 UTC (JD 2451550.0 is noon that day); `29.530588853` days is the mean synodic month. Names follow the usual eight phases with the primary phases (new, quarters, full) given a ±0.0375-cycle window (about 1.1 days), which absorbs the drift between the mean lunation used here and the true one. The little moon drawn on the card uses the same φ: the terminator is an ellipse of x-radius |cos 2πφ|, lit on the right while waxing.
 
+## 4c. Where the Sun stood
+
+Not astrology — the opposite. First the Sun's apparent ecliptic longitude at noon on your date, from the standard low-precision formula (good to ~0.01°):
+
+```
+n = JDN − 2451545                     days since J2000.0
+L = 280.460 + 0.9856474·n             mean longitude
+g = 357.528 + 0.9856003·n             mean anomaly
+λ = L + 1.915·sin g + 0.020·sin 2g    apparent longitude, equinox of date
+```
+
+Then which constellation that longitude falls in, using the **IAU's 1930 boundaries** projected onto the ecliptic (J2000 longitudes: Pisces 351.57°→29.05°, Aries →53.47°, Taurus →90.43°, Gemini →118.26°, Cancer →138.18°, Leo →174.15°, Virgo →217.80°, Libra →241.14°, Scorpius →248.03°, **Ophiuchus** →266.60°, Sagittarius →299.71°, Capricornus →327.89°, Aquarius →351.57°). Because λ is measured from the equinox *of date* and the boundaries are fixed at J2000, we first subtract precession, ≈ 0.01397° per year since 2000 — under a degree for any living person, but it matters within a day of a boundary.
+
+The card also computes what a horoscope would have said — `floor(λ / 30)` into twelve equal signs starting at 0° Aries — and reports whether the two agree. Usually they don't: the horoscope's signs were pinned to the constellations around 2,000 years ago and precession has since slid the real sky about one constellation along. The ecliptic actually crosses **thirteen** constellations; the Sun spends only ~7 days a year in Scorpius and ~18 in Ophiuchus, which no zodiac sign covers.
+
 ## 5. The destination (the only random part — and it's not random)
 
 ```

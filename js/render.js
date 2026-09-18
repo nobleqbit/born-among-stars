@@ -136,6 +136,7 @@ export function renderPass(pass, root) {
           ${tile('Physics, lightly misused', `<p>${esc(pass.quantum)}</p>`)}
           ${tile('What you’ve got', `<p>${esc(d.strength)}</p>`)}
           ${tile('The fine print', `<p>${esc(d.caution)}</p>`)}
+          ${tile('Where the Sun stood', `<p>${esc(pass.sun.line)}</p><p class="tile__small">Ecliptic longitude ${pass.sun.longitude.toFixed(1)}° · the ecliptic crosses thirteen constellations, not twelve</p>`, true)}
           ${tile('Where to point next', `<p class="tile__forward">${esc(d.forward)}</p>${pass.smile[1] ? `<p class="tile__small">${esc(pass.smile[1])}</p>` : ''}`, true)}
           <section class="tile tile--wide tile--working">
             <details class="working">
@@ -197,14 +198,24 @@ export async function passToImage(pass) {
   const maxW = W - pad * 2;
   const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d');
-  const img = await loadImage(pass.image);
+  const serif = '"Fraunces", Georgia, "Times New Roman", serif';
+  // Make sure the self-hosted display face is decoded before we measure text,
+  // otherwise the canvas silently falls back to Georgia and wraps differently.
+  const [img] = await Promise.all([
+    loadImage(pass.image),
+    (async () => {
+      try {
+        await Promise.all([`700 48px ${serif}`, `italic 700 30px ${serif}`, `700 30px ${serif}`]
+          .map((f) => document.fonts.load(f)));
+      } catch { /* fall back to Georgia; still a fine card */ }
+    })(),
+  ]);
 
   // Measure first: lay out into a list of {text, font, color, gap}.
   const blocks = [];
   const add = (text, font, color, gap = 10, width = maxW) => blocks.push({ text, font, color, gap, width });
   const d = pass.destination;
   const mono = '"SF Mono", Menlo, Consolas, monospace';
-  const serif = 'Georgia, "Times New Roman", serif';
   const sans = '-apple-system, "Segoe UI", Helvetica, Arial, sans-serif';
 
   add(`COSMIC BOARDING PASS · ${pass.occasion.label.toUpperCase()}`, `600 18px ${mono}`, '#8fb3ff', 4);

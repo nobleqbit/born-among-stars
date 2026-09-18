@@ -4,7 +4,8 @@
 import { julianDayNumber, todayJDN, numberProfile, weekdayOf } from './julian.js';
 import {
   yearsFromDays, cosmicOdometer, localDaysLived, lightMail, nextWholeOrbit,
-  moonPhase, birthdayBroadcast, DAYS_PER_YEAR, SYNODIC_MONTH, REFERENCE_NEW_MOON_JD,
+  moonPhase, birthdayBroadcast, sunConstellation,
+  DAYS_PER_YEAR, SYNODIC_MONTH, REFERENCE_NEW_MOON_JD,
 } from './astronomy.js';
 import { cosmicSignature } from './signature.js';
 import { CATALOG, CATALOG_SIZE } from './catalog.js';
@@ -177,6 +178,19 @@ export async function composePass(input) {
     ? `Meanwhile the light — and the radio — that left Earth the day you were ${occ.dateWord} is ${fmt(ageYears, 1)} light-years out. It passed ${bc.last.name} about ${bc.lastYearsAgo < 1 ? 'this year' : fmt(bc.lastYearsAgo) + (bc.lastYearsAgo < 2 ? ' year ago' : ' years ago')}${bc.next ? `; it reaches ${bc.next.name} in ${bc.nextInYears < 1 ? 'less than a year' : fmt(bc.nextInYears) + (bc.nextInYears < 2 ? ' year' : ' years')}.` : '.'}`
     : `Meanwhile the light that left Earth the day you were ${occ.dateWord} is ${fmt(ageYears, 1)} light-years out — it hasn't reached the nearest star yet. Proxima Centauri is ${bc.next.ly} light-years away; your broadcast arrives there in ${fmt(bc.nextInYears, 1)} years.`;
 
+  // Where the Sun actually stood — the astronomers' constellation, and what
+  // the horoscope would have claimed instead.
+  const sun = sunConstellation(jdn, year);
+  const cname = sun.constellation.name;
+  const aside = cname === 'Ophiuchus'
+    ? ' Ophiuchus gets eighteen days a year that no horoscope sign admits to.'
+    : cname === 'Scorpius'
+      ? ' The Sun spends only seven days a year in front of Scorpius; the horoscope hands it thirty.'
+      : '';
+  const sunLine = sun.agree
+    ? `The Sun stood in front of ${cname} that day — the astronomers’ ${cname}, inside borders the IAU fixed in 1930. For once the horoscope agrees, though only by coincidence: it still reads the sky of two thousand years ago.${aside}`
+    : `The Sun stood in front of ${cname} that day — the astronomers’ ${cname}, inside borders the IAU fixed in 1930. A horoscope would have said ${sun.sign}. Horoscopes still read the sky of two thousand years ago; the sky has since moved on by a whole constellation.${aside}`;
+
   // "Show the working": the actual arithmetic behind this card, numbers in.
   const a = Math.floor((14 - month) / 12);
   const yy = year + 4800 - a;
@@ -207,6 +221,13 @@ export async function composePass(input) {
     `The Moon that night`,
     `  (${jdn} + 0.5 − ${REFERENCE_NEW_MOON_JD}) ÷ ${SYNODIC_MONTH} = ${cycles.toFixed(3)} lunations`,
     `  fractional part ${moon.phase.toFixed(3)} → ${moon.name}; illumination (1 − cos 2πφ)/2 = ${Math.round(moon.illumination * 100)}%`,
+    ``,
+    `Where the Sun stood`,
+    `  n = ${jdn} − 2451545 = ${sun.n} days since J2000`,
+    `  L = 280.460 + 0.9856474·n → ${sun.L.toFixed(2)}°;  g = 357.528 + 0.9856003·n → ${sun.g.toFixed(2)}°`,
+    `  λ = L + 1.915·sin g + 0.020·sin 2g = ${sun.longitude.toFixed(2)}° (equinox of date)`,
+    `  → J2000: λ − 0.01397·(${year} − 2000) = ${sun.longitudeJ2000.toFixed(2)}°`,
+    `  IAU ${cname} spans ${sun.constellation.from}°–${sun.constellation.to}° → ${cname};  horoscope slice floor(λ/30) → ${sun.sign}`,
     ``,
     `Destination`,
     `  SHA-256("born-among-stars|${jdn}|${occasion}") = ${sig.hex.slice(0, 16)}…`,
@@ -267,6 +288,14 @@ export async function composePass(input) {
       ...moon,
       percent: Math.round(moon.illumination * 100),
       label: `${moon.name} · ${Math.round(moon.illumination * 100)}% lit`,
+    },
+    sun: {
+      constellation: cname,
+      sign: sun.sign,
+      agree: sun.agree,
+      longitude: sun.longitude,
+      label: `${cname} · ${sun.longitude.toFixed(1)}°`,
+      line: sunLine,
     },
     working,
     quantum: QUANTUM_LINES[sig.salt % QUANTUM_LINES.length],

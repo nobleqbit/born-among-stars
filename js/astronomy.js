@@ -168,3 +168,62 @@ export function birthdayBroadcast(ageYears) {
     nextInYears: next ? next.ly - ageYears : null,
   };
 }
+
+// ── Where the Sun stood ───────────────────────────────────────────────────
+// The Sun's apparent ecliptic longitude on the date (low-precision formula,
+// good to ~0.01°), then which IAU constellation that longitude falls in.
+// These are the astronomers' boundaries, fixed by the IAU in 1930 — not the
+// twelve equal 30° "signs" of the horoscope, which drifted off the real
+// constellations two millennia ago. The ecliptic crosses thirteen.
+
+/** IAU constellation boundaries along the ecliptic, J2000 longitudes (degrees). */
+export const ECLIPTIC_CONSTELLATIONS = [
+  { name: 'Pisces',       from: 351.57, to: 29.05,  days: 38 },
+  { name: 'Aries',        from: 29.05,  to: 53.47,  days: 25 },
+  { name: 'Taurus',       from: 53.47,  to: 90.43,  days: 37 },
+  { name: 'Gemini',       from: 90.43,  to: 118.26, days: 31 },
+  { name: 'Cancer',       from: 118.26, to: 138.18, days: 21 },
+  { name: 'Leo',          from: 138.18, to: 174.15, days: 37 },
+  { name: 'Virgo',        from: 174.15, to: 217.80, days: 45 },
+  { name: 'Libra',        from: 217.80, to: 241.14, days: 23 },
+  { name: 'Scorpius',     from: 241.14, to: 248.03, days: 7 },
+  { name: 'Ophiuchus',    from: 248.03, to: 266.60, days: 18 },
+  { name: 'Sagittarius',  from: 266.60, to: 299.71, days: 32 },
+  { name: 'Capricornus',  from: 299.71, to: 327.89, days: 28 },
+  { name: 'Aquarius',     from: 327.89, to: 351.57, days: 24 },
+];
+
+/** The twelve tropical signs the horoscope uses: equal 30° slices from 0° Aries. */
+export const ZODIAC_SIGNS = ['Aries', 'Taurus', 'Gemini', 'Cancer', 'Leo', 'Virgo',
+  'Libra', 'Scorpio', 'Sagittarius', 'Capricorn', 'Aquarius', 'Pisces'];
+
+const norm360 = (x) => ((x % 360) + 360) % 360;
+const rad = (deg) => (deg * Math.PI) / 180;
+
+/** Apparent geocentric ecliptic longitude of the Sun at noon on a JDN, equinox of date,
+ *  with the intermediate quantities so the card can show the working. */
+export function sunLongitudeParts(jdn) {
+  const n = jdn - 2451545.0; // days since J2000.0 (noon, 1 Jan 2000)
+  const L = norm360(280.460 + 0.9856474 * n);   // mean longitude
+  const g = norm360(357.528 + 0.9856003 * n);   // mean anomaly
+  const lon = norm360(L + 1.915 * Math.sin(rad(g)) + 0.020 * Math.sin(rad(2 * g)));
+  return { n, L, g, lon };
+}
+export const sunLongitude = (jdn) => sunLongitudeParts(jdn).lon;
+
+/**
+ * Which constellation the Sun was in front of, plus what the horoscope would
+ * have said. Longitude of date is brought to J2000 (precession ≈ 0.01397°/yr)
+ * before comparing against the J2000 boundaries.
+ */
+export function sunConstellation(jdn, year) {
+  const parts = sunLongitudeParts(jdn);
+  const lonOfDate = parts.lon;
+  const lonJ2000 = norm360(lonOfDate - 0.013969 * (year - 2000));
+  const constellation = ECLIPTIC_CONSTELLATIONS.find(({ from, to }) =>
+    from < to ? (lonJ2000 >= from && lonJ2000 < to) : (lonJ2000 >= from || lonJ2000 < to));
+  const sign = ZODIAC_SIGNS[Math.floor(lonOfDate / 30)];
+  // "Scorpius" vs the horoscope's "Scorpio", "Capricornus" vs "Capricorn".
+  const same = constellation.name.startsWith(sign.slice(0, 5));
+  return { ...parts, longitude: lonOfDate, longitudeJ2000: lonJ2000, constellation, sign, agree: same };
+}

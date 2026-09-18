@@ -3,7 +3,10 @@ import assert from 'node:assert/strict';
 import {
   julianDayNumber, fromJulianDayNumber, primeFactors, digitalRoot, numberProfile, weekdayOf,
 } from '../js/julian.js';
-import { lightMail, cosmicOdometer, nextWholeOrbit, yearsFromDays, moonPhase, birthdayBroadcast } from '../js/astronomy.js';
+import {
+  lightMail, cosmicOdometer, nextWholeOrbit, yearsFromDays, moonPhase, birthdayBroadcast,
+  sunConstellation, ECLIPTIC_CONSTELLATIONS,
+} from '../js/astronomy.js';
 import { cosmicSignature } from '../js/signature.js';
 import { composePass } from '../js/compose.js';
 import { CATALOG } from '../js/catalog.js';
@@ -100,6 +103,40 @@ test('birthday broadcast brackets the age between two stars', () => {
   assert.equal(baby.next.name, 'Proxima Centauri');
 });
 
+test('IAU ecliptic boundaries are contiguous and cover the full circle', () => {
+  let span = 0;
+  for (let i = 0; i < ECLIPTIC_CONSTELLATIONS.length; i++) {
+    const c = ECLIPTIC_CONSTELLATIONS[i];
+    const next = ECLIPTIC_CONSTELLATIONS[(i + 1) % ECLIPTIC_CONSTELLATIONS.length];
+    assert.equal(c.to, next.from, `${c.name} → ${next.name} gap`);
+    span += c.from < c.to ? c.to - c.from : 360 - c.from + c.to;
+  }
+  assert.ok(Math.abs(span - 360) < 1e-9);
+  assert.equal(ECLIPTIC_CONSTELLATIONS.length, 13);
+});
+
+test('where the Sun stood: known dates', () => {
+  const at = (y, m, d) => sunConstellation(julianDayNumber(y, m, d), y);
+  // Early December: the thirteenth constellation nobody's horoscope mentions.
+  assert.equal(at(2000, 12, 5).constellation.name, 'Ophiuchus');
+  assert.equal(at(2000, 12, 5).sign, 'Sagittarius');
+  assert.equal(at(2000, 12, 5).agree, false);
+  // Late November: Scorpius's seven days.
+  assert.equal(at(2000, 11, 25).constellation.name, 'Scorpius');
+  // The March equinox point sits in Pisces — the horoscope calls it Aries.
+  const eq = at(2000, 3, 20);
+  assert.ok(eq.longitude < 1 || eq.longitude > 359, `equinox longitude ${eq.longitude}`);
+  assert.equal(eq.constellation.name, 'Pisces');
+  assert.equal(eq.sign, 'Aries');
+  // A date where the two agree.
+  const mar = at(1990, 3, 14);
+  assert.equal(mar.constellation.name, 'Pisces');
+  assert.equal(mar.agree, true);
+  // 1 Jan 2001: Sagittarius by the sky, Capricorn by the horoscope.
+  assert.equal(at(2001, 1, 1).constellation.name, 'Sagittarius');
+  assert.equal(at(2001, 1, 1).sign, 'Capricorn');
+});
+
 test('signature is deterministic and maps into the catalog', async () => {
   const a = await cosmicSignature(2447965, 'birthday', CATALOG.length);
   const b = await cosmicSignature(2447965, 'birthday', CATALOG.length);
@@ -149,6 +186,9 @@ test('composePass assembles a full card', async () => {
   assert.ok(pass.working.some((l) => l.includes('= 2447965')), 'working shows the JDN derivation');
   assert.ok(pass.working.some((l) => l.includes('5 × 13 × 13 × 2897')));
   assert.ok(pass.working.some((l) => l.includes('→ Io')));
+  assert.equal(pass.sun.constellation, 'Pisces');
+  assert.match(pass.sun.line, /IAU fixed in 1930/);
+  assert.ok(pass.working.some((l) => l.includes('IAU Pisces spans')));
 });
 
 test('callsigns are pronounceable across many dates', async () => {

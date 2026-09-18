@@ -27,6 +27,7 @@ That line is not a metaphor. It is checkable physics, personalised to a date. Th
 | **Cosmic odometer** | How many Mercury / Mars / Jupiter / Saturn orbits you've completed, and when your next whole-orbit "birthday" falls | ✅ NASA periods |
 | **Light-mail** | The star whose distance in light-years ≈ your age, and exactly when tonight's light left it — plus the mirror image: which star the light that left Earth on your date has just passed, and which it reaches next | ✅ published distances |
 | **The Moon that night** | Phase and illumination on your date, drawn | ✅ mean-phase arithmetic |
+| **Where the Sun stood** | The constellation the Sun was *actually* in front of (IAU boundaries — there are thirteen, including Ophiuchus) and what a horoscope would have claimed instead | ✅ ecliptic longitude; gently anti-astrology |
 | **Show the working** | Every number on the card derived with your values substituted, one click away | ✅ it's the point |
 | **The number itself** | Prime factorisation, digital root, palindrome check of your JDN | ✅ arithmetic |
 | **Quantum note** | One honest piece of quantum mechanics, read as advice | physics, wry |
@@ -88,6 +89,7 @@ js/render.js        DOM rendering + JPEG share-image export
 js/main.js          UI, permalinks, starfield
 js/images.js        credit / license / source for every bundled image
 img/                one photo per destination, served same-origin
+fonts/              Fraunces (OFL), self-hosted display face
 CREDITS.md          image attributions
 tests/              node --test
 docs/MATH.md        every formula, with sources
@@ -97,4 +99,4 @@ docs/screenshot.jpg the README image, captured from docs/card.html
 
 ## License
 
-Code: [MIT](LICENSE). Images: NASA imagery is public domain; the few Creative Commons images (see [`CREDITS.md`](CREDITS.md)) remain under their own licenses, not MIT. Not affiliated with NASA, ESA, or anyone else who actually goes to space.
+Code: [MIT](LICENSE). Images: NASA imagery is public domain; the few Creative Commons images (see [`CREDITS.md`](CREDITS.md)) remain under their own licenses, not MIT. Type: [Fraunces](https://github.com/undercasetype/Fraunces) by Undercase Type, SIL Open Font License 1.1 ([`fonts/OFL.txt`](fonts/OFL.txt)), self-hosted so no font request leaves the page. Not affiliated with NASA, ESA, or anyone else who actually goes to space.
